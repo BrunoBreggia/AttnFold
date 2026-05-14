@@ -11,6 +11,7 @@ import argparse
 
 # Manage parser
 parser = argparse.ArgumentParser(description="Creacion de pdfs con las predicciones del modelo en forma grafica (mapas de calor)")
+parser.add_argument("tanda", help="Dataset empleado para el test")
 parser.add_argument("exp_dir", help="Directorio con los resultados")
 args = parser.parse_args()
 
@@ -316,6 +317,8 @@ def choose_samples(tanda):
         sample_name = [f"prueba{i}" for i in range(6)]
     elif tanda in ["16_testeo"]:
         sample_name = [f"prueba{i}" for i in range(250)]
+    elif tanda in ["17_testeo"]:
+        sample_name = [f"prueba{i}" for i in range(64)]
     else:
         sample_name = [f"prueba{i}" for i in range(7)]
 
@@ -327,12 +330,12 @@ if __name__ == "__main__":
     # visualize_many_samples(sample_name, tanda, output_pdf=exp_dir+"test_visualization.pdf")
     ## visualize_heads_per_sample(sample_name, tanda)
 
-    exp_dir = args.exp_dir
+    tanda = args.tanda
+    exp_dir = Path(args.exp_dir)
 
-    exp_dir = Path(exp_dir)
     print(f"Output dir: {exp_dir}")
-    tanda = get_train_dataset(exp_dir)
     print(f"Tanda: {tanda}")
+
     samples = choose_samples(tanda)
     print(f"Amount of samples: {len(samples)}")
         

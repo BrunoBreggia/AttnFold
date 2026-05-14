@@ -148,7 +148,7 @@ class SincFold(nn.Module):
 
     def save_routine(self, matrix, mat_stage, id):
         if self.save_flag: # and len(batch['id']) == 1:
-            np_matrix = np.squeeze(matrix)
+            np_matrix = np.squeeze(matrix.detach().cpu().numpy())
             np.savetxt(f"{self.save_dir}/{mat_stage}_{id}.csv", np_matrix, delimiter=',')
         
     def loss_func(self, yhat, y):
