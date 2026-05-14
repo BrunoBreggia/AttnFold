@@ -1,5 +1,6 @@
 from matplotlib.colors import LogNorm
 import numpy as np
+from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from sincfold.utils import dot2matrix
@@ -9,12 +10,12 @@ import os
 import argparse
 
 # Manage parser
-parser = argparse.ArgumentParser(description="Creacion de pdfs con matrices de conexion")
-parser.add_argument("exp_dir", help="Directorio con resultados a graficar")
+parser = argparse.ArgumentParser(description="Creacion de pdfs con las predicciones del modelo en forma grafica (mapas de calor)")
+parser.add_argument("exp_dir", help="Directorio con los resultados")
 args = parser.parse_args()
 
-exp_dir = "Experiments/experiment_103/"
-data_dir = exp_dir + "matrices/"
+#exp_dir = "Experiments/experiment_103/"
+#data_dir = exp_dir + "matrices/"
 
 
 #sample_name = "prueba0"
@@ -44,6 +45,7 @@ def dot_to_kmer_dot(dot):
         kmer_dot += dot[i]
     return kmer_dot
 
+# TODO: adapt this function
 def visualize_single_sample(sample_name, tanda):
     mat_1 = np.loadtxt("middle_matrix/compressed_" + sample_name + ".csv", delimiter=",")
     mat_2 = np.loadtxt("middle_matrix/expanded_" + sample_name + ".csv", delimiter=",")
@@ -77,16 +79,20 @@ def visualize_single_sample(sample_name, tanda):
 
     # read the csv file from output_trial_3/train_log.csv as dataframe and plot the  
 
-def visualize_many_samples(sample_names, tanda, output_pdf="sample/results_visualization.pdf"):
+def visualize_many_samples(sample_names, tanda, exp_dir):
     mats_per_page = 6
     cols = 5
     cell_size = 2.5
     label_space = 0.10
+
+    exp_dir = Path(exp_dir)
+    data_dir = exp_dir / "matrices/"
+    output_pdf = exp_dir/f"test_tanda_{tanda}.pdf"
     
     def load_sample_data(name):
-        mat_1 = np.loadtxt(data_dir + f"compressed_{name}.csv", delimiter=",")
-        mat_2 = np.loadtxt(data_dir + f"expanded_{name}.csv", delimiter=",")
-        mat_3 = np.loadtxt(data_dir + f"final_{name}.csv", delimiter=",")
+        mat_1 = np.loadtxt(data_dir / f"compressed_{name}.csv", delimiter=",")
+        mat_2 = np.loadtxt(data_dir / f"expanded_{name}.csv", delimiter=",")
+        mat_3 = np.loadtxt(data_dir / f"final_{name}.csv", delimiter=",")
 
         # remove bias column if present
         if mat_1.shape[0] < mat_1.shape[1]:
@@ -171,6 +177,7 @@ def visualize_many_samples(sample_names, tanda, output_pdf="sample/results_visua
     
     print(f"PDF saved to {output_pdf}")
 
+# TODO: adapt this function
 def visualize_heads_per_sample(sample_names, tanda, output_pdf="sample/heads_visualization.pdf"):
     """
     Generate pdf with one page per 4 samples, each page with 8 columns:
@@ -263,17 +270,21 @@ def visualize_heads_per_sample(sample_names, tanda, output_pdf="sample/heads_vis
     
     print(f"PDF saved to {output_pdf}")
 
-def leer_config(output_dir):
-    ...
+def get_train_dataset(output_dir):
+    with open(output_dir / "exp_config.txt", "r") as file:
+        for line in file:
+            if "train_file" in line:
+                train_file = line.split(":")[1].strip()
+                break
+    tanda = train_file[train_file.rfind("\\")+13:-4]
+    return tanda
 
-if __name__ == "__main__":
-    ## visualize_single_sample(sample_name, tanda)
-    # visualize_many_samples(sample_name, tanda, output_pdf=exp_dir+"test_visualization.pdf")
-    ## visualize_heads_per_sample(sample_name, tanda)
+def choose_samples(tanda):
+    sample_name = []
 
-    tanda = "1"
-
-    if tanda in ["7_mix1", "7_mix2"]:
+    if tanda in ["1", "2", "3", "4", "5", "6", "8"]:
+        sample_name = [f"prueba{i}" for i in range(7)]
+    elif tanda in ["7_mix1", "7_mix2"]:
         sample_name = [f"prueba{i}" for i in range(3)] + [f"prueba{i}" for i in range(300,303)] + [f"prueba{i}" for i in range(600,603)]
     elif tanda in ["7_mix3", "7_mix4", "10"]:
         sample_name = [f"prueba{i}" for i in range(6)] + [f"prueba{i}" for i in range(500,506)]
@@ -305,7 +316,26 @@ if __name__ == "__main__":
         sample_name = [f"prueba{i}" for i in range(6)]
     elif tanda in ["16_testeo"]:
         sample_name = [f"prueba{i}" for i in range(250)]
-    else: # tanda in ["1", "2", "3", "4", "5", "6", "8"]:
+    else:
         sample_name = [f"prueba{i}" for i in range(7)]
+
+    return sample_name
+
+
+if __name__ == "__main__":
+    ## visualize_single_sample(sample_name, tanda)
+    # visualize_many_samples(sample_name, tanda, output_pdf=exp_dir+"test_visualization.pdf")
+    ## visualize_heads_per_sample(sample_name, tanda)
+
+    exp_dir = args.exp_dir
+
+    exp_dir = Path(exp_dir)
+    print(f"Output dir: {exp_dir}")
+    tanda = get_train_dataset(exp_dir)
+    print(f"Tanda: {tanda}")
+    samples = choose_samples(tanda)
+    print(f"Amount of samples: {len(samples)}")
+        
+    visualize_many_samples(samples, tanda, exp_dir=exp_dir)
+
     
-    visualize_many_samples(sample_name, tanda, output_pdf=exp_dir+f"test_tanda_{tanda}.pdf")
