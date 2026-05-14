@@ -1,4 +1,5 @@
 /venv
-/Experiments
+/Experimentos
 /src/sincfold/__pycache__
 /actions/__pycache__
+/sample/train_tanda*

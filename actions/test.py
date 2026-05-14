@@ -47,7 +47,12 @@ def test_attention_model(
         kwargs = {}
         for line in f:
             k,v = line.strip().split(":")
-            kwargs[k.strip()] = v.strip()
+            try:
+                kwargs[k.strip()] = eval(v.strip())
+            except Exception:
+                kwargs[k.strip()] = v.strip()
+
+    print(kwargs)
 
     model = SincFold(attention_only=True, device=device, verbose=verbose,
                     save_dir=out_dir, **kwargs)

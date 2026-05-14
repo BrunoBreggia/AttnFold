@@ -122,7 +122,7 @@ def visualize_many_samples(sample_names, tanda, exp_dir):
         except Exception as e:
             print(f"Error loading sample {sample_name}: {e}")
     
-    titles = ["Ground Truth", "Ground Truth Tokenizado", "Matriz de Atención", "Unpooled", "Simetrico"]
+    titles = ["Ground Truth", "Ground Truth Tokenizado", "Matriz de Atención", "Unpooled", "Final"]
     
     with PdfPages(output_pdf) as pdf:
         for page_start in range(0, len(all_sample_data), mats_per_page):
