@@ -5,10 +5,10 @@ from sincfold.utils import bp2matrix
 import seaborn as sns
 from matplotlib.colors import LogNorm
 
-exp = 80
+exp = 123
 mat_groud_truth_file = 'sample/train_tanda_14_testeo.csv'
 sample = 'prueba0'
-mat_pred_file = f'Architecture7/output_trial_{exp}/middle_matrix/compressed_{sample}.csv'
+mat_pred_file = f'Experimentos/expx_{exp}/matrices/compressed_{sample}.csv'
 
 
 def get_gt_matrix(mat_groud_truth_file, sample, half=False):
@@ -124,7 +124,7 @@ def comparisson_matrix(groud_truths, sample_labels, exps):
             mean_error_mat = 0
             for k, sublabel in enumerate(sublabels):
                 #graph_error(groud_truths[counter], get_pred_matrix(f'Architecture7/output_trial_{exp}/middle_matrix/compressed_{sublabel}.csv', select_top=1), graph_log=False)
-                pred_mat = get_pred_matrix(f'../myExperiments/output_trial_{exp}/middle_matrix_100epochs/compressed_{sublabel}.csv', select_top=0)
+                pred_mat = get_pred_matrix(f'Experimentos/exp_{exp}/matrices/compressed_{sublabel}.csv', select_top=0)
                 mean_error_mat += calculate_error(groud_truths[counter], pred_mat)
                 counter += 1
             mean_error_mat /= len(sublabels)
@@ -143,8 +143,8 @@ if __name__ == "__main__":
     #graph_error(mat_gt, mat_pred, True)
 
     # Example of comparisson matrix
-    ground_truths = [get_gt_matrix(mat_groud_truth_file, sample, half=True) for sample in [f'prueba{i}' for i in range(0, 29)]]
-    exps = list(range(95, 100))
+    ground_truths = [get_gt_matrix(mat_groud_truth_file, sample, half=False) for sample in [f'prueba{i}' for i in range(0, 29)]]
+    exps = list(range(124, 125))
     sample_labels = [
         # [f'prueba{i}' for i in range(0, 7)],
         # [f'prueba{i}' for i in range(7, 13)],

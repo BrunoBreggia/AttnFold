@@ -9,6 +9,9 @@ from sincfold.utils import bp2dot
 import os
 import argparse
 
+# Forma de usar el script
+# $ python sample/visualization 17_test Experimentos/exp_111
+
 # Manage parser
 parser = argparse.ArgumentParser(description="Creacion de pdfs con las predicciones del modelo en forma grafica (mapas de calor)")
 parser.add_argument("tanda", help="Dataset empleado para el test")
@@ -319,6 +322,14 @@ def choose_samples(tanda):
         sample_name = [f"prueba{i}" for i in range(250)]
     elif tanda in ["17_testeo"]:
         sample_name = [f"prueba{i}" for i in range(64)]
+    elif "17_" in tanda:
+        num = int(tanda.split("_")[1])
+        sample_name = []
+        counter = 0
+        for _ in range(num):
+            for i in range(10,0,-1):
+                sample_name.append(f"prueba{counter}")
+                counter += i
     else:
         sample_name = [f"prueba{i}" for i in range(7)]
 
