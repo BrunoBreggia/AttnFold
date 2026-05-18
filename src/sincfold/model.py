@@ -155,6 +155,8 @@ class SincFold(nn.Module):
         
     def loss_func(self, yhat, y):
         """yhat and y are [N, M, M]"""
+        if self.mask:
+            y = tr.tril(y)
         y = y.view(y.shape[0], -1)
         yhat = yhat.view(yhat.shape[0], -1)
         yhat = yhat.unsqueeze(1)
