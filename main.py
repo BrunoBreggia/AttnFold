@@ -23,6 +23,7 @@ parser_attention.add_argument("--continue", action="store_true", help="Continues
 #parser_attention.add_argument("--valid-file", help="Validation data CSV file")
 #parser_attention.add_argument("--config-file", help="JSON config file")
 parser_attention.add_argument("--epochs", type=int, default=100, help="Number of epochs")
+parser_attention.add_argument("--emb_dim", type=int, default=32, help="Embedding dimension")
 parser_attention.add_argument("--pos_enc", type=str, default="absolute", help="Positional encoding")
 parser_attention.add_argument("--force_symmetry", action="store_true", help="Forces symmetry in internal matrix prediction")
 parser_attention.add_argument("--mask", action="store_true", help="Sets upper triangular mask")

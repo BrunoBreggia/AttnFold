@@ -86,6 +86,8 @@ class SincFold(nn.Module):
         if self.force_symmetry:
             self.msg("Symmetry activated")
 
+        print(f"Embedding dimension: {emb_dim}")
+
         self.optimizer_attention = tr.optim.Adam(self.attention.parameters(), lr=lr)
         self.scheduler = tr.optim.lr_scheduler.StepLR(self.optimizer_attention, step_size=100, gamma=0.1)
         
@@ -254,7 +256,7 @@ class AttentionMatrix(nn.Module):
         self.device = device
         self.mask = mask
         self.k_bias = k_bias
-        self.embedding = nn.Embedding(85, d_model)
+        self.embedding = nn.Embedding(65, d_model)
         self.pos_encoding = PositionalEncoding(d_model=d_model, enc_base=enc_base, max_len=5000)
         self.multiHead_1 = nn.MultiheadAttention(d_model, 
                                                  num_heads=1,
@@ -313,7 +315,7 @@ class RoPEAttnLayer(nn.Module):
         self.d_head = d_model // n_heads
         self.inv_sqrt_d_head = 1.0 / tr.sqrt(tr.tensor(self.d_head) + 1e-8)
 
-        self.embedding = nn.Embedding(85, d_model)
+        self.embedding = nn.Embedding(65, d_model)
         
         self.multi_head_in_projection = nn.Linear(d_model, 3 * d_model, bias=bias)
         self.multi_head_out_projection = nn.Linear(d_model, d_model, bias=bias)
