@@ -20,8 +20,7 @@ dependencies = [
   "pandas==2.0.2",
   "numpy==1.24.2",
   "scikit-learn==1.2.1",
-  "tqdm==4.64.1",
-  "grakel==0.1.10"
+  "tqdm==4.64.1"
 ]
 
 [project.urls]
