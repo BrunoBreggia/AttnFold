@@ -1,3 +1,5 @@
+import json
+
 import torch as tr
 from torch.utils.data import DataLoader
 from pathlib import Path
@@ -20,14 +22,19 @@ def test_attention_model(
     batch_size = kwargs.get('batch_size', 1)
 
     logfile = out_dir / "train_log_attention.csv"
-    config_file = out_dir / "exp_config.txt"
+    config_file = out_dir / "exp_config.json"
 
     if not os.path.exists(logfile):
         raise FileNotFoundError(f"Log file not found at {logfile}")
     
-    attention_weights_path = out_dir / "weights_attention.pmt"
-    if not os.path.exists(attention_weights_path):
-        raise FileNotFoundError(f"Attention weights not found at {attention_weights_path}")
+    with open(config_file, "r") as f:
+        kwargs = json.load(f)
+    print(kwargs)
+
+    epochs = kwargs['epochs']
+    weights_path = out_dir / f"checkpoint_epoch_{epochs}.pmt"
+    if not os.path.exists(weights_path):
+        raise FileNotFoundError(f"Attention weights not found at {weights_path}")
     
     config = load_config()
 
@@ -42,22 +49,10 @@ def test_attention_model(
         collate_fn=pad_batch,
     )
 
-    # Get model configuration from config file
-    with open(config_file, "r") as f:
-        kwargs = {}
-        for line in f:
-            k,v = line.strip().split(":")
-            try:
-                kwargs[k.strip()] = eval(v.strip())
-            except Exception:
-                kwargs[k.strip()] = v.strip()
-
-    print(kwargs)
-
-    model = SincFold(attention_only=True, device=device, verbose=verbose,
+    model = SincFold(device=device, verbose=verbose,
                     save_dir=out_dir, **kwargs)
-    print(f"Loading model weights from {attention_weights_path}...")
-    model.load_attention(attention_weights_path)
+    print(f"Loading model weights from {weights_path}...")
+    model.load_checkpoint(weights_path)
     
     print("Testing model...")
     metrics = model.test(test_loader)

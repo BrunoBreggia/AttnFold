@@ -8,7 +8,7 @@ exps=(1 2 3 4 5 6 7 8 9 10)
 
 for i in "${!exps[@]}"
 do
-    python main.py train-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}" --pos_enc absolute --mask --k_bias --emb_dim 32 --seed $1 --epochs 20
+    python main.py train-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}" --pos_enc absolute --k_bias --mask --emb_dim 32 --seed $1 --epochs 20
     python main.py test-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}"
     python sample/visualization.py "17_${data[$i]}" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}"
     mv "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}/matrices" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}/matrices_epochs20"
@@ -27,7 +27,7 @@ exps=(11 12 13 14 15 16 17 18 19 20)
 
 for i in "${!exps[@]}"
 do
-    python main.py train-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}" --pos_enc absolute --mask --k_bias --emb_dim 64 --seed $1 --epochs 20
+    python main.py train-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}" --pos_enc absolute --k_bias --mask --emb_dim 64 --seed $1 --epochs 20
     python main.py test-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}"
     python sample/visualization.py "17_${data[$i]}" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}"
     mv "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}/matrices" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}/matrices_epochs20"
@@ -46,7 +46,7 @@ exps=(21 22 23 24 25 26 27 28 29 30)
 
 for i in "${!exps[@]}"
 do
-    python main.py train-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}" --pos_enc absolute --mask --k_bias --emb_dim 128 --seed $1 --epochs 20
+    python main.py train-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}" --pos_enc absolute --k_bias --mask --emb_dim 128 --seed $1 --epochs 20
     python main.py test-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}"
     python sample/visualization.py "17_${data[$i]}" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}"
     mv "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}/matrices" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}/matrices_epochs20"
@@ -65,7 +65,7 @@ exps=(31 32 33 34 35 36 37 38 39 40)
 
 for i in "${!exps[@]}"
 do
-    python main.py train-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}" --pos_enc absolute --mask --k_bias --emb_dim 256 --seed $1 --epochs 20
+    python main.py train-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}" --pos_enc absolute --k_bias --mask --emb_dim 256 --seed $1 --epochs 20
     python main.py test-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}"
     python sample/visualization.py "17_${data[$i]}" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}"
     mv "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}/matrices" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}/matrices_epochs20"
@@ -84,7 +84,7 @@ exps=(41 42 43 44 45 46 47 48 49 50)
 
 for i in "${!exps[@]}"
 do
-    python main.py train-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}" --pos_enc absolute --mask --k_bias --emb_dim 512 --seed $1 --epochs 20
+    python main.py train-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}" --pos_enc absolute --k_bias --mask --emb_dim 512 --seed $1 --epochs 20
     python main.py test-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}"
     python sample/visualization.py "17_${data[$i]}" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}"
     mv "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}/matrices" "Experimentos/TV_APE_seed_$1/exp_${exps[$i]}/matrices_epochs20"

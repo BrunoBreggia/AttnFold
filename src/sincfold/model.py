@@ -13,7 +13,7 @@ from sincfold.metrics import contact_f1
 from sincfold.utils import mat2bp, postprocessing
 from sincfold._version import __version__
 
-def sincfold(pretrained=False, weights=None, attention_only=True, **kwargs):
+def sincfold(pretrained=False, weights=None, **kwargs):
     """ 
     SincFold: a deep learning-based model for RNA secondary structure prediction
     pretrained (bool): Use pretrained weights (from attention matrix)
@@ -21,7 +21,7 @@ def sincfold(pretrained=False, weights=None, attention_only=True, **kwargs):
     weights (str): Path to weights file to load
     **kwargs: Model hyperparameters
     """
-    model = SincFold(attention_only=attention_only, **kwargs)
+    model = SincFold(**kwargs)
     if pretrained:
         print("Funcionalidad todavia no implementada")
     else:
@@ -39,21 +39,18 @@ class SincFold(nn.Module):
     def __init__(
                     self,
                     device="cpu",
-                    attention_only=True,
                     pos_enc="absolute", # or "rope"
                     negative_weight=0.1,
                     emb_dim=32,
-                    lr=1e-4,
-                    lr_conv=1e-4,
+                    lr_inicial=1e-4,
                     verbose=True,
                     save_dir=None,
-                    conv_k=3,
                     **kwargs
                 ):
         super().__init__()
+        print(kwargs)
 
         self.device = device
-        self.attention_only = attention_only
         self.pos_enc = pos_enc.lower()
         self.class_weight = tr.tensor([negative_weight, 1.0]).float().to(device)
         self.verbose = verbose
@@ -73,30 +70,37 @@ class SincFold(nn.Module):
         # Choose type of attention
         if self.pos_enc in ["absolute", "abs"]:
             self.msg("Training with ABSOLUTE positional encoding")
-            self.attention = AttentionMatrix(d_model=emb_dim, device=device,
-                                            enc_base=self.enc_base,
-                                            mask=self.mask,
-                                            k_bias=self.k_bias,
-                                            )
+            self.attention = AttentionMatrix(
+                d_model=emb_dim, device=device,
+                enc_base=self.enc_base,
+                mask=self.mask,
+                k_bias=self.k_bias,
+                )
         elif self.pos_enc in ["rope", "rotary"]:
             self.msg("Training with ROTARY positional encoding")
-            self.attention = RoPEAttnLayer(d_model=emb_dim, device=device,
-                                            )
+            self.attention = RoPEAttnLayer(
+                d_model=emb_dim, 
+                device=device,
+                )
+        else:
+            raise ValueError(f"Positional encoding {self.pos_enc} not recognized. Use 'absolute' or 'rope'")
         
         if self.force_symmetry:
             self.msg("Symmetry activated")
 
-        print(f"Embedding dimension: {emb_dim}")
+        self.msg(f"Embedding dimension: {emb_dim}")
 
-        self.optimizer_attention = tr.optim.Adam(self.attention.parameters(), lr=lr)
-        self.scheduler = tr.optim.lr_scheduler.StepLR(self.optimizer_attention, step_size=100, gamma=0.1)
+        # Define optimizer and scheduler
+        self.optimizer = tr.optim.Adam(self.parameters(), lr=lr_inicial)
+        self.scheduler = tr.optim.lr_scheduler.ReduceLROnPlateau(
+            self.optimizer,
+            mode='min',
+            patience=20, 
+            factor=0.5,
+            min_lr=1e-6
+            )
         
-        if not attention_only:
-            self.conv = Conv2DBlock(k=conv_k, device=device)
-            self.optimizer_conv = tr.optim.Adam(self.conv.parameters(), lr=lr_conv)
-        else:
-            self.conv = None
-            self.optimizer_conv = None
+        self.msg(f"Initial learning rate: {lr_inicial}")
 
         self.to(device)
     
@@ -132,10 +136,6 @@ class SincFold(nn.Module):
         # checkpoint
         self.save_routine(expanded, "expanded", batch['id'][0])
         
-        # Aplicacion de convolucion
-        if not self.attention_only and self.conv is not None:
-            expanded = self.conv(expanded)
-        
         # simetria forzada
         if self.force_symmetry:
             expanded_t = tr.transpose(expanded, -1, -2)
@@ -155,15 +155,24 @@ class SincFold(nn.Module):
         
     def loss_func(self, yhat, y):
         """yhat and y are [N, M, M]"""
+
         if self.mask:
             y = tr.tril(y)
-        y = y.view(y.shape[0], -1)
-        yhat = yhat.view(yhat.shape[0], -1)
-        yhat = yhat.unsqueeze(1)
-        yhat = tr.cat((-yhat, yhat), dim=1)
-        error_loss = cross_entropy(yhat, y, ignore_index=-1, weight=self.class_weight, label_smoothing=0.1) # smoothing added
-        loss = error_loss
-        return loss
+
+        y = y.view(y.shape[0], -1)              # [N, M*M]
+        yhat = yhat.view(yhat.shape[0], -1)     # [N, M*M]
+
+        yhat = yhat.unsqueeze(1)            # [N, 1, M*M]
+        yhat = tr.cat((-yhat, yhat), dim=1) # [N, 2, M*M]
+
+        error_loss = cross_entropy(
+            yhat, y, 
+            ignore_index=-1,            # ignore the padding values -1
+            weight=self.class_weight,   # class prediction weight 
+            label_smoothing=0.1         # smoothing added
+            ) 
+
+        return error_loss
 
     def test(self, loader):
         """
@@ -204,31 +213,33 @@ class SincFold(nn.Module):
         self.save_flag = False
         return metrics
 
-    def freeze_attention(self):
-        for p in self.attention.parameters():
-            p.requires_grad = False
+    def save_checkpoint(self, epoch, loss, path):
+        checkpoint = {
+            'epoch': epoch,
+            'model_state': self.state_dict(),
+            'optimizer_state': self.optimizer.state_dict(),
+            'scheduler_state': self.scheduler.state_dict(),
+            #'rng_state': tr.get_rng_state(),
+            # 'rng_state_cuda': tr.cuda.get_rng_state() if tr.cuda.is_available() else None,
+            'loss': loss,
+        }
+        tr.save(checkpoint, path)
+        self.msg(f"Checkpoint guardado en época {epoch}")
 
-    def unfreeze_attention(self):
-        for p in self.attention.parameters():
-            p.requires_grad = True
-
-    def freeze_conv(self):
-        if self.conv is not None:
-            for p in self.conv.parameters():
-                p.requires_grad = False
-
-    def unfreeze_conv(self):
-        if self.conv is not None:
-            for p in self.conv.parameters():
-                p.requires_grad = True
-
-    def save_attention(self, path):
-        tr.save(self.attention.state_dict(), path)
-        #print(f"Attention weights saved to {path}")
-
-    def load_attention(self, path):
-        self.attention.load_state_dict(tr.load(path, map_location=self.device))
-        #print(f"Attention weights loaded from {path}")
+    def load_checkpoint(self, path):
+        checkpoint = tr.load(path, map_location=self.device)
+        
+        self.load_state_dict(checkpoint['model_state'])
+        self.optimizer.load_state_dict(checkpoint['optimizer_state'])
+        self.scheduler.load_state_dict(checkpoint['scheduler_state'])
+        #tr.set_rng_state(checkpoint['rng_state'].cpu())
+        # if tr.cuda.is_available() and checkpoint['rng_state_cuda'] is not None:
+        #     tr.cuda.set_rng_state(checkpoint['rng_state_cuda'])
+        start_epoch = checkpoint['epoch'] + 1
+        loss = checkpoint['loss']
+        
+        self.msg(f"Retomando desde época {start_epoch}, loss anterior: {loss:.4f}")
+        return start_epoch, loss
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, enc_base=1000.0, max_len=5000):
@@ -384,6 +395,10 @@ class RoPEAttnLayer(nn.Module):
         k = k.view(B, T, self.n_heads, self.d_head).transpose(1, 2)
         q = q.view(B, T, self.n_heads, self.d_head).transpose(1, 2)
         v = v.view(B, T, self.n_heads, self.d_head).transpose(1, 2)
+
+        # NEW: normalize before applying rope 
+        #q = F.normalize(q, dim=-1)
+        #k = F.normalize(k, dim=-1)
 
         # apply RoPE transformation [1, p. 7]
         q_rope = self._apply_rope(q)

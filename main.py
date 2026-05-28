@@ -31,6 +31,8 @@ parser_attention.add_argument("--k_bias", action="store_true", help="Sets k bias
 parser_attention.add_argument("--nworkers", type=int, default=2, help="Number of workers")
 parser_attention.add_argument("--batch-size", type=int, default=4, help="Batch size")
 parser_attention.add_argument("--seed", type=int, default=78, help="Seed for random number generators")
+parser_attention.add_argument("--lr_inicial", type=float, default=1e-4, help="Initial learning rate")
+
 
 # parser for test mode
 parser_test_attention = subparsers.add_parser("test-attention", help="Test attention-only model")

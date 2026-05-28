@@ -330,6 +330,8 @@ def choose_samples(tanda):
             for i in range(10,0,-1):
                 sample_name.append(f"prueba{counter}")
                 counter += i
+    elif tanda == 'variable_stems':
+        sample_name = [f"prueba{i}" for i in range(40)]
     else:
         sample_name = [f"prueba{i}" for i in range(7)]
 
