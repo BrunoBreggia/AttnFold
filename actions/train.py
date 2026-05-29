@@ -54,12 +54,13 @@ def train_attention(**kwargs):
         # load the configurations of last training cycles
         with open(config_file, "r") as f:
             kwargs = json.load(f)
-            if total_epochs <= kwargs['epochs']:
-                print(f"Model is already trained with {kwargs['epochs']} epochs")
-                print("Will be left as is")
-                return ;
-            else:
-                aditional_epochs = total_epochs - prev_epochs
+        if total_epochs <= kwargs['epochs']:
+            print(f"Model is already trained with {kwargs['epochs']} epochs")
+            print("Will be left as is")
+            return ;
+        else:
+            aditional_epochs = total_epochs - prev_epochs
+            kwargs['epochs'] = total_epochs
         print(f"Will continue training for an aditional {aditional_epochs} epochs")
 
     config = load_config() # load from config file
