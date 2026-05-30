@@ -10,7 +10,7 @@ for i in "${!exps[@]}"
 do
     # Experiment exclusively with rotary positional encoding
 
-    python main.py train-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_ROPE_seed_42/exp_${exps[$i]}" --pos_enc rope --emb_dim 256 --seed 42 --epochs 200
+    python main.py train-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_ROPE_seed_42/exp_${exps[$i]}" --pos_enc rope --emb_dim 256 --seed 42 --epochs 100
     # Overfitting test
     python main.py test-attention "sample/train_tanda_17_${data[$i]}.csv" "Experimentos/TV_ROPE_seed_42/exp_${exps[$i]}"
     python sample/visualization.py "17_${data[$i]}" "Experimentos/TV_ROPE_seed_42/exp_${exps[$i]}"
