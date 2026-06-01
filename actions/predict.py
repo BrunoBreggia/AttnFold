@@ -13,6 +13,8 @@ from sincfold.tokenizer import k3_tokenizer
 
 def predict_sequence(sequence, out_dir, batch_size=1):
 
+    out_dir = Path(kwargs.get('out_dir'))
+    
     # 1. Validate sequence
     sequence = sequence.upper().strip()
     valid_nt = set(['A', 'C', 'G', 'U', 'T'])
