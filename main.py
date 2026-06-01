@@ -32,6 +32,8 @@ parser_attention.add_argument("--nworkers", type=int, default=2, help="Number of
 parser_attention.add_argument("--batch-size", type=int, default=4, help="Batch size")
 parser_attention.add_argument("--seed", type=int, default=78, help="Seed for random number generators")
 parser_attention.add_argument("--lr_inicial", type=float, default=1e-4, help="Initial learning rate")
+parser_attention.add_argument("--negative_weight", type=float, default=0.1, help="Ponderation of the negative class at loss function calculation")
+parser_attention.add_argument("--positive_weight", type=float, default=1.0, help="Ponderation of the positive class at loss function calculation")
 
 
 # parser for test mode
@@ -48,9 +50,9 @@ parser_test_attention.add_argument("--batch-size", type=int, default=1, help="Ba
 parser_predict = subparsers.add_parser("predict-sequence", help="Predict RNA structure from raw sequence")
 parser_predict.add_argument("sequence", help="RNA sequence (A, C, G, U/T)")
 parser_predict.add_argument("out_dir", help="Output directory (must contain weights file)")
-parser_predict.add_argument("--weights-type", choices=['attention', 'full'], default='full',
-                        help="Type of weights: 'attention' or 'full'")
-parser_predict.add_argument("--config", help="JSON config file")
+#parser_predict.add_argument("--weights-type", choices=['attention', 'full'], default='full',
+#                        help="Type of weights: 'attention' or 'full'")
+#parser_predict.add_argument("--config", help="JSON config file")
 parser_predict.add_argument("--batch-size", type=int, default=1, help="Batch size")
 
 args = parser.parse_args()

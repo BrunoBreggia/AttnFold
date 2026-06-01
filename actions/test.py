@@ -27,6 +27,9 @@ def test_attention_model(
     if not os.path.exists(logfile):
         raise FileNotFoundError(f"Log file not found at {logfile}")
     
+    if not os.path.exists(config_file):
+        raise FileNotFoundError(f"Log file not found at {logfile}")
+    
     with open(config_file, "r") as f:
         kwargs = json.load(f)
     print(kwargs)
