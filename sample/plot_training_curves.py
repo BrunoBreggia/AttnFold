@@ -13,7 +13,7 @@ args = parser.parse_args()
 exp = args.exp
 
 # Logfile for attention only training
-file1 = f"Experimentos/{exp}/train_log_attention.csv" # change to train_log.csv if file not found
+file1 = f"{exp}/train_log_attention.csv" # change to train_log.csv if file not found
 
 df = pd.read_csv(file1)
 
@@ -43,7 +43,7 @@ plt.title('Training Curves')
 plt.grid(True)
 fig.tight_layout() 
 #plt.legend()
-plt.savefig(f"Experimentos/{exp}/training_curve.png")
+plt.savefig(f"{exp}/training_curve.png")
 
 # Log file for convolution training
 # file2 = f"Experimentos/exp_{exp}/train_log_conv.csv"

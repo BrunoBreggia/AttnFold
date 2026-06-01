@@ -41,6 +41,7 @@ class SincFold(nn.Module):
                     device="cpu",
                     pos_enc="absolute", # or "rope"
                     negative_weight=0.1,
+                    positive_weight=1.0,
                     emb_dim=32,
                     lr_inicial=1e-4,
                     verbose=True,
@@ -52,7 +53,7 @@ class SincFold(nn.Module):
 
         self.device = device
         self.pos_enc = pos_enc.lower()
-        self.class_weight = tr.tensor([negative_weight, 1.0]).float().to(device)
+        self.class_weight = tr.tensor([negative_weight, positive_weight]).float().to(device)
         self.verbose = verbose
         self.output_th = 0.5
 
@@ -69,7 +70,7 @@ class SincFold(nn.Module):
 
         # Choose type of attention
         if self.pos_enc in ["absolute", "abs"]:
-            self.msg("Training with ABSOLUTE positional encoding")
+            self.msg("Instantiating with ABSOLUTE positional encoding")
             self.attention = AttentionMatrix(
                 d_model=emb_dim, device=device,
                 enc_base=self.enc_base,
@@ -77,7 +78,7 @@ class SincFold(nn.Module):
                 k_bias=self.k_bias,
                 )
         elif self.pos_enc in ["rope", "rotary"]:
-            self.msg("Training with ROTARY positional encoding")
+            self.msg("Instantiating with ROTARY positional encoding")
             self.attention = RoPEAttnLayer(
                 d_model=emb_dim, 
                 device=device,
