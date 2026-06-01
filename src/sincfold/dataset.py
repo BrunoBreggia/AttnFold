@@ -6,7 +6,7 @@ import json
 import pickle
 from sincfold.embeddings import OneHotEmbedding
 from sincfold.utils import valid_mask, prob_mat, bp2matrix, dot2bp
-from sincfold.tokenizer import k3_tokenizer
+from sincfold.tokenizer import k3_tokenizer_v2 as k3_tokenizer
 
 class SeqDataset(Dataset):
     def __init__(
