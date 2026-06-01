@@ -239,7 +239,7 @@ class SincFold(nn.Module):
         start_epoch = checkpoint['epoch'] + 1
         loss = checkpoint['loss']
         
-        self.msg(f"Retomando desde época {start_epoch}, loss anterior: {loss:.4f}")
+        self.msg(f"Epocas entrenadas: {start_epoch}")
         return start_epoch, loss
 
 class PositionalEncoding(nn.Module):

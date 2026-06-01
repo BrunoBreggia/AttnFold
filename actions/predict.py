@@ -88,16 +88,26 @@ def predict_sequence(sequence, out_dir, batch_size=1):
     pred_matrix = pred_matrix.squeeze(0).cpu().numpy()
     
     # 7. Save heatmap
-    os.makedirs("resultados", exist_ok=True)
+    os.makedirs("predictions", exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
-    plt.figure(figsize=(8, 8))
-    sns.heatmap(pred_matrix, annot=False, cmap='plasma')
-    plt.title(f"Predicted Contact Matrix\nSequence: {sequence[:30]}...")
-    plt.xlabel("Position")
-    plt.ylabel("Position")
+    #plt.figure(figsize=(8, 8))
+    #sns.heatmap(pred_matrix, annot=False, cmap='plasma')
+
+    fig, ax = plt.subplots(figsize=(10, 10))
+    step = 1
+    xticks = list(range(0, pred_matrix.shape[1], step))
+    yticks = list(range(0, pred_matrix.shape[0], step))
+    sns.heatmap(pred_matrix, annot=False, linewidths=0.1, linecolor='black', cmap='plasma', ax=ax,
+                xticklabels=xticks, yticklabels=yticks, square=True)
+    ax.tick_params(left=True, bottom=True, labelsize=6)
+    ax.collections[0].colorbar.remove() # remove color bar
     
-    img_path = f"resultados/prediction_{timestamp}.png"
+    plt.title(f"Predicted Contact Matrix\nSequence: {sequence[:30]}...")
+    plt.xlabel("Nucleotide")
+    plt.ylabel("Nucleotide")
+    
+    img_path = f"predictions/prediction_{timestamp}.png"
     plt.savefig(img_path, dpi=150)
     plt.close()
     print(f"Heatmap saved to {img_path}")
