@@ -132,7 +132,7 @@ class SincFold(nn.Module):
         # expanded = interpolate(y0, size=(target_size,target_size), mode='nearest')
         # if target_size < L:
         padding = k-1
-        expanded = pad(expanded, (0 ,padding, 0, padding), mode="constant", value=0)
+        expanded = pad(y0, (0 ,padding, 0, padding), mode="constant", value=0)
         
         # checkpoint
         self.save_routine(expanded, "expanded", batch['id'][0])
