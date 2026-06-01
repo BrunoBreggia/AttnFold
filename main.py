@@ -71,8 +71,6 @@ if __name__ == "__main__":
         predict_sequence(
             args.sequence,
             args.out_dir,
-            weights_type=args.weights_type,
-            config_file=args.config,
             batch_size=args.batch_size
         )
     else:
